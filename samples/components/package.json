@@ -2,7 +2,7 @@
   "name": "filter-buddy",
   "version": "1.0.0",
   "description": "A Web Component for conveniently displaying filtering options.",
-  "main": "Filter_Buddy.js",
+  "main": "Filter_Buddy.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

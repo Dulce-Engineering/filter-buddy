@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <script src="components/index.mjs" type="module"></script>
+    <script type="module">
+      window.onload = Main;
+
+      function Main()
+      {
+        const filters = document.getElementById("filters");
+        filters.addEventListener("search", OnSearch_Filter);
+        filters.filters =
+        [
+          {
+            id: "WHERE_SOURCE",
+            label: "Source",
+            class_name: "Filter_Text", 
+            in_mid_view: true
+          },
+          {
+            id: "WHERE_TAG",
+            label: "Tag",
+            class_name: "Filter_Text", 
+            in_mid_view: true
+          },
+          {
+            id: "WHERE_NAME",
+            label: "Name",
+            class_name: "Filter_Text", 
+            in_mid_view: false
+          }
+        ];
+      }
+
+      function OnSearch_Filter(event)
+      {
+        const search = JSON.stringify(event.detail);
+        alert(search);
+      }
+    </script>
+  </head>
+  <body>
+    <filter-buddy id="filters"></filter-buddy>
+  </body>
+</html>
