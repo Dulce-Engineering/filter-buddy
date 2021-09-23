@@ -159,6 +159,10 @@ class Filter_Buddy extends HTMLElement
       {
         const filter = def[view + "_filter"];
         def.value = filter.value;
+        if (filter.Get_Text)
+        {
+          def.text = filter.Get_Text(def.value);
+        }
       }
     }
   }
@@ -258,7 +262,14 @@ class Filter_Buddy extends HTMLElement
       delete_btn.innerText = "Delete";
 
       span = document.createElement("span");
-      span.innerText = def.label + " = " + value;
+      if (def.text)
+      {
+        span.innerText = def.label + ": " + def.text;
+      }
+      else
+      {
+        span.innerText = def.label + ": " + value;
+      }
       span.style.border = "1px solid red";
       span.append(delete_btn);
     }
@@ -399,18 +410,31 @@ class Select
 
   set value(input_value)
   {
-    this.input.value = "";
+    this.select.value = "";
     if (!Utils.isEmpty(input_value))
     {
-      this.input.value = input_value;
+      this.select.value = input_value;
     }
+  }
+
+  Get_Text(input_value)
+  {
+    let text;
+
+    const option = this.select.querySelector("option[value='" + input_value + "']");
+    if (option)
+    {
+      text = option.innerText;
+    }
+
+    return text;
   }
 
   get value()
   {
     let res;
 
-    const input_value = this.input.value;
+    const input_value = this.select.value;
     if (!Utils.isEmpty(input_value))
     {
       res = input_value;
@@ -421,14 +445,21 @@ class Select
 
   Render()
   {
-    this.input = document.createElement("input");
-    this.input.id = "ptFilter_" + this.def.id;
+    this.select = document.createElement("select");
+    this.select.id = "ptFilter_" + this.def.id;
+    for (const def_option of this.def.options)
+    {
+      const option = document.createElement("option");
+      option.value = def_option.value;
+      option.innerText = def_option.text;
+      this.select.append(option);
+    }
 
     this.label = document.createElement("label");
-    this.label.for = this.input.id;
+    this.label.for = this.select.id;
     this.label.innerText = this.def.label;
 
-    return [this.label, this.input];
+    return [this.label, this.select];
   }
 }
 Filter_Buddy.Select = Select;
