@@ -2,6 +2,8 @@
   <head>
     <script src="components/index.mjs" type="module"></script>
     <script type="module">
+      import Filter_Buddy from "./components/Filter_Buddy.mjs";
+
       window.onload = Main;
 
       function Main()
@@ -13,19 +15,19 @@
           {
             id: "WHERE_SOURCE",
             label: "Source",
-            class_name: "Filter_Text", 
+            filter_class: Filter_Buddy.Text, 
             in_mid_view: true
           },
           {
             id: "WHERE_TAG",
             label: "Tag",
-            class_name: "Filter_Text", 
+            filter_class: Filter_Buddy.Text, 
             in_mid_view: true
           },
           {
             id: "WHERE_NAME",
             label: "Name",
-            class_name: "Filter_Text", 
+            filter_class: Filter_Buddy.Text, 
             in_mid_view: false
           }
         ];

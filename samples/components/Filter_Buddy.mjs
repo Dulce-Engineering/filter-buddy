@@ -1,7 +1,7 @@
 import Utils from "./Utils.mjs";
 import ptDropdown from "./DE_Dropdown.mjs"
 
-class ptFilter extends HTMLElement 
+class Filter_Buddy extends HTMLElement 
 {
   static name = "filter-buddy";
 
@@ -210,18 +210,6 @@ class ptFilter extends HTMLElement
     return defs;
   }
 
-  New_Filter(def)
-  {
-    let filter;
-
-    if (def.class_name == "Filter_Text")
-    {
-      filter = new Filter_Text(def);
-    }
-
-    return filter;
-  }
-
   // rendering ====================================================================================
 
   Show_View(view_name)
@@ -285,7 +273,7 @@ class ptFilter extends HTMLElement
       const elems = [];
       for (const filter_def of filter_defs)
       {
-        const filter = this.New_Filter(filter_def);
+        const filter = new filter_def.filter_class(filter_def);
         const filter_elems = filter.Render();
         elems.push(filter_elems);
 
@@ -359,7 +347,7 @@ class ptFilter extends HTMLElement
   }
 }
 
-class Filter_Text
+class Text
 {
   constructor(def)
   {
@@ -400,5 +388,49 @@ class Filter_Text
     return [this.label, this.input];
   }
 }
+Filter_Buddy.Text = Text;
 
-export default ptFilter;
+class Select
+{
+  constructor(def)
+  {
+    this.def = def;
+  }
+
+  set value(input_value)
+  {
+    this.input.value = "";
+    if (!Utils.isEmpty(input_value))
+    {
+      this.input.value = input_value;
+    }
+  }
+
+  get value()
+  {
+    let res;
+
+    const input_value = this.input.value;
+    if (!Utils.isEmpty(input_value))
+    {
+      res = input_value;
+    }
+
+    return res;
+  }
+
+  Render()
+  {
+    this.input = document.createElement("input");
+    this.input.id = "ptFilter_" + this.def.id;
+
+    this.label = document.createElement("label");
+    this.label.for = this.input.id;
+    this.label.innerText = this.def.label;
+
+    return [this.label, this.input];
+  }
+}
+Filter_Buddy.Select = Select;
+
+export default Filter_Buddy;
