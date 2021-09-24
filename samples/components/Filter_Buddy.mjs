@@ -518,6 +518,56 @@ class Number
 }
 Filter_Buddy.Number = Number;
 
-// timestamp
+class Date_Time
+{
+  constructor(def)
+  {
+    this.def = def;
+  }
+
+  set value(input_value)
+  {
+    this.input.value = "";
+    if (!Utils.isEmpty(input_value))
+    {
+      this.input.value = input_value;
+    }
+  }
+
+  get value()
+  {
+    let res;
+
+    const input_value = this.input.value;
+    if (!Utils.isEmpty(input_value))
+    {
+      res = input_value;
+    }
+
+    return res;
+  }
+
+  Get_Text(input_value)
+  {
+    const date = new Date(input_value);
+    const res = date.toLocaleString();
+
+    return res;
+  }
+
+  Render()
+  {
+    this.input = document.createElement("input");
+    this.input.id = "ptFilter_" + this.def.id;
+    this.input.type = "datetime-local";
+
+    this.label = document.createElement("label");
+    this.label.for = this.input.id;
+    this.label.innerText = this.def.label;
+
+    return [this.label, this.input];
+  }
+}
+Filter_Buddy.Date_Time = Date_Time;
 
 export default Filter_Buddy;
