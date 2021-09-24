@@ -64,9 +64,9 @@ class Filter_Buddy extends HTMLElement
 
   set view(view_name)
   {
-    const filter_data = this.Get_View_Data();
+    this.Get_View_Data();
     this.Show_View(view_name);
-    this.Set_View_Data(filter_data);
+    this.Set_View_Data();
 
     this.Render_Update_Summ();
   }
@@ -129,6 +129,7 @@ class Filter_Buddy extends HTMLElement
 
   OnClick_Search_Btn()
   {
+    this.Get_View_Data();
     const filter_data = this.Get_Data();
     const search_event = new CustomEvent("search", {detail: filter_data});
     this.dispatchEvent(search_event);
@@ -463,5 +464,60 @@ class Select
   }
 }
 Filter_Buddy.Select = Select;
+
+class Number
+{
+  constructor(def)
+  {
+    this.def = def;
+  }
+
+  set value(input_value)
+  {
+    this.input.value = "";
+    if (!Utils.isEmpty(input_value))
+    {
+      input_value = parseInt(input_value);
+      if (isNaN(input_value))
+      {
+        input_value = 0;
+      }
+      this.input.value = input_value;
+    }
+  }
+
+  get value()
+  {
+    let res;
+
+    const input_value = this.input.value;
+    if (!Utils.isEmpty(input_value))
+    {
+      res = parseInt(input_value);
+      if (isNaN(res))
+      {
+        res = 0;
+      }
+    }
+
+    return res;
+  }
+
+  Render()
+  {
+    this.input = document.createElement("input");
+    this.input.id = "ptFilter_" + this.def.id;
+    this.input.type = "number";
+
+    this.label = document.createElement("label");
+    this.label.for = this.input.id;
+    this.label.innerText = this.def.label;
+
+    return [this.label, this.input];
+  }
+}
+Filter_Buddy.Number = Number;
+
+// timestamp
 
 export default Filter_Buddy;
