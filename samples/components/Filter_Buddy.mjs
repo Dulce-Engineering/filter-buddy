@@ -10,19 +10,24 @@ class Filter_Buddy extends HTMLElement
   constructor() 
   {
     super();
+
+    this.init_view = "min";
+
     this.OnClick_Switch_View_Btn = this.OnClick_Switch_View_Btn.bind(this);
     this.OnClick_Set_View = this.OnClick_Set_View.bind(this);
     this.OnClick_Min_Add_Filter_Btn = this.OnClick_Min_Add_Filter_Btn.bind(this);
     this.OnClick_Mid_Add_Filter_Btn = this.OnClick_Mid_Add_Filter_Btn.bind(this);
     this.OnClick_Search_Btn = this.OnClick_Search_Btn.bind(this);
     this.OnClick_Del_Filter_Btn = this.OnClick_Del_Filter_Btn.bind(this);
+    this.OnClick_Max_Clear_Btn = this.OnClick_Max_Clear_Btn.bind(this);
+    this.OnClick_Max_Cancel_Btn = this.OnClick_Max_Cancel_Btn.bind(this);
   }
 
   connectedCallback()
   {
     const rootElem = this.Render();
     this.replaceChildren(rootElem);
-    this.view = "max";
+    this.view = this.init_view;
   }
 
   disconnectedCallback()
@@ -35,10 +40,13 @@ class Filter_Buddy extends HTMLElement
 
   }
 
-  //static observedAttributes = ['a1', "a2", "a3"];
+  static observedAttributes = ["view"];
   attributeChangedCallback(attrName, oldValue, newValue)
   {
-
+    if (attrName == "view")
+    {
+      this.init_view = newValue;
+    }
   }
 
   // fields =======================================================================================
@@ -49,28 +57,16 @@ class Filter_Buddy extends HTMLElement
   
   set filters(filter_defs)
   {
-    /*
-      filterDefs =
-      [
-        {
-          id: "WHERE_SOURCE",
-          inputType: "text", 
-          in_mid_view: true
-        }
-      ]
-    */
     this.filter_defs = filter_defs;
     this.Render_View(this.mid_filter_defs, "mid_filters_div", "mid");
     this.Render_View(this.filter_defs, "max_filters_div", "max");
+    this.Show_View();
   }
 
   set view(view_name)
   {
     this.Get_View_Data();
-    this.Show_View(view_name);
-    this.Set_View_Data();
-
-    this.Render_Update_Summ();
+    this.Show_View_With_Data(view_name);
   }
 
   get view()
@@ -120,12 +116,14 @@ class Filter_Buddy extends HTMLElement
   OnClick_Min_Add_Filter_Btn()
   {
     this.return_view = "min";
+    this.show_cancel_btn = true;
     this.view = "max";
   }
 
   OnClick_Mid_Add_Filter_Btn()
   {
     this.return_view = "mid";
+    this.show_cancel_btn = true;
     this.view = "max";
   }
 
@@ -147,6 +145,27 @@ class Filter_Buddy extends HTMLElement
   {
     def.value = undefined;
     this.Render_Update_Summ();
+  }
+
+  OnClick_Max_Clear_Btn()
+  {
+    if (!Utils.isEmpty(this.filter_defs))
+    {
+      for (const def of this.filter_defs)
+      {
+        def.value = undefined;
+      }
+    }
+    this.Set_View_Data();
+  }
+
+  OnClick_Max_Cancel_Btn()
+  {
+    if (this.return_view)
+    {
+      this.Show_View_With_Data(this.return_view);
+      this.return_view = null;
+    }
   }
 
   // misc =========================================================================================
@@ -243,12 +262,27 @@ class Filter_Buddy extends HTMLElement
 
   // rendering ====================================================================================
 
+  Show_View_With_Data(view_name)
+  {
+    this.Show_View(view_name);
+    this.Set_View_Data();
+
+    this.Render_Update_Summ();
+  }
+
   Show_View(view_name)
   {
-    this.min_view_div.hidden = true;
-    this.mid_view_div.hidden = true;
-    this.max_view_div.hidden = true;
-    this[view_name + "_view_div"].hidden = false;
+    if (view_name)
+    {
+      this.min_view_div.hidden = true;
+      this.mid_view_div.hidden = true;
+      this.max_view_div.hidden = true;
+      this[view_name + "_view_div"].hidden = false;
+    }
+    else
+    {
+      view_name = this.view;
+    }
 
     if (view_name == "min")
     {
@@ -267,6 +301,15 @@ class Filter_Buddy extends HTMLElement
         mid_add_filter_btn.hidden = !this.Has_Max_Filters();
       }
     }
+
+    if (view_name == "max")
+    {
+      const max_cancel_btn = this.querySelector("#max_cancel_btn");
+      if (max_cancel_btn)
+      {
+        max_cancel_btn.hidden = !this.show_cancel_btn;
+      }
+    }
   }
 
   Render_Update_Summ()
@@ -278,9 +321,12 @@ class Filter_Buddy extends HTMLElement
       const summary_elems = [];
 
       let defs = this.filter_defs;
-      if (view == "mid")
+      if (!Utils.isEmpty(defs))
       {
-        defs = this.filter_defs.filter(d => !d.in_mid_view);
+        if (view == "mid")
+        {
+          defs = defs.filter(d => !d.in_mid_view);
+        }
       }
 
       if (!Utils.isEmpty(defs))
@@ -414,10 +460,37 @@ class Filter_Buddy extends HTMLElement
         {
           margin-left: 10px;
         }
+        #max_view_body
+        {
+          font-family: sans-serif;
+          font-size: 12px;
+          display: inline-block;
+        }
+        #max_btn_div
+        {
+          justify-content: flex-end;
+          display: flex;
+          gap: 5px;
+          margin-top: 5px;
+        }
+        #max_filters_div
+        {
+          display: grid;
+          grid-template-columns: 1fr 2fr 1fr 2fr;
+          gap: 5px;
+        }
+        #max_filters_div label
+        {
+          justify-self: end;
+        }
+        #mid_summ_div
+        {
+          margin: 5px 0px 0px 10px;
+        }
       </style>
 
-      <button id="switchViewBtn">view</button>
-      <span id="switchViewListPlaceholder"></span>
+      <!--button id="switch_view_btn">view</button>
+      <span id="switch_view_list_placeholder"></span-->
 
       <span id="min_view_div">
         <button id="min_add_filter_btn" class="fb_filter_btn">${filter_svg}</button>
@@ -434,10 +507,16 @@ class Filter_Buddy extends HTMLElement
         <div id="mid_summ_div"></div>
       </span>
 
-      <div id="max_view_div">
-        <div id="max_filters_div"></div>
-        <button id="max_search_btn">Search</button>
-      </div>
+      <span id="max_view_div">
+        <span id="max_view_body">
+          <div id="max_filters_div"></div>
+          <div id="max_btn_div">
+            <button id="max_clear_btn">Clear</button>
+            <button id="max_search_btn">Search</button>
+            <button id="max_cancel_btn">Cancel</button>
+          </div>
+        </span>
+      </span>
     `;
     const doc = Utils.toDocument(html);
 
@@ -456,22 +535,30 @@ class Filter_Buddy extends HTMLElement
     this.min_view_div = doc.getElementById("min_view_div");
     this.mid_view_div = doc.getElementById("mid_view_div");
     this.max_view_div = doc.getElementById("max_view_div");
+    this.min_view_div.hidden = true;
+    this.mid_view_div.hidden = true;
+    this.max_view_div.hidden = true;
 
-    this.switchViewBtn = doc.getElementById("switchViewBtn");
-    this.switchViewBtn.addEventListener("click", this.OnClick_Switch_View_Btn);
+    //this.switch_view_btn = doc.getElementById("switch_view_btn");
+    //this.switch_view_btn.addEventListener("click", this.OnClick_Switch_View_Btn);
+
+    let btn = doc.getElementById("max_clear_btn");
+    btn.addEventListener("click", this.OnClick_Max_Clear_Btn);
+    btn = doc.getElementById("max_cancel_btn");
+    btn.addEventListener("click", this.OnClick_Max_Cancel_Btn);
 
     //await window.customElements.whenDefined('pt-dropdown');
-    const items = 
+    /*const items = 
     [
       {label: 'Close', action: this.OnClick_Set_View, data: "min"},
       {label: 'Minimal', action: this.OnClick_Set_View, data: "mid"},
       {label: 'Open', action: this.OnClick_Set_View, data: "max"},
     ];
-    const switchViewList = new ptDropdown();
-    switchViewList.items = items;
-    switchViewList.srcElem = this.switchViewBtn;
-    switchViewList.style.width = "100px";
-    doc.getElementById("switchViewListPlaceholder").append(switchViewList);
+    const switch_view_list = new ptDropdown();
+    switch_view_list.items = items;
+    switch_view_list.srcElem = this.switch_view_btn;
+    switch_view_list.style.width = "100px";
+    doc.getElementById("switch_view_list_placeholder").append(switch_view_list);*/
 
     return doc;
   }
@@ -573,6 +660,7 @@ class Select
       option.innerText = def_option.text;
       this.select.append(option);
     }
+    this.select.value = undefined;
 
     this.label = document.createElement("label");
     this.label.for = this.select.id;
