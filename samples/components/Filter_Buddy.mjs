@@ -22,6 +22,7 @@ class Filter_Buddy extends HTMLElement
   {
     const rootElem = this.Render();
     this.replaceChildren(rootElem);
+    this.view = "min";
   }
 
   disconnectedCallback()
@@ -45,6 +46,7 @@ class Filter_Buddy extends HTMLElement
   // input types: text, time, time_range, date, date_range, timestamp, timestamp_range,
   // boolean, one_off, integer, integer_range, float, float_range, currency, currency_range
   // auto_complete
+  
   set filters(filter_defs)
   {
     /*
@@ -149,6 +151,18 @@ class Filter_Buddy extends HTMLElement
 
   // misc =========================================================================================
 
+  Have_Filters()
+  {
+    let res = false;
+
+    if (!Utils.isEmpty(this.filter_defs))
+    {
+      res = this.filter_defs.some(def => def.value != undefined);
+    }
+
+    return res;
+  }
+
   Get_View_Data()
   {
     const view = this.view;
@@ -223,6 +237,15 @@ class Filter_Buddy extends HTMLElement
     this.mid_view_div.hidden = true;
     this.max_view_div.hidden = true;
     this[view_name + "_view_div"].hidden = false;
+
+    if (view_name == "min")
+    {
+      const min_search_btn = this.querySelector("#min_search_btn");
+      if (min_search_btn)
+      {
+        min_search_btn.hidden = !this.Have_Filters();
+      }
+    }
   }
 
   Render_Update_Summ()
@@ -239,12 +262,15 @@ class Filter_Buddy extends HTMLElement
         defs = this.filter_defs.filter(d => !d.in_mid_view);
       }
 
-      for (const def of defs)
+      if (!Utils.isEmpty(defs))
       {
-        const summary_elem = this.Render_Summary_Elem(def);
-        if (summary_elem)
+        for (const def of defs)
         {
-          summary_elems.push(summary_elem);
+          const summary_elem = this.Render_Summary_Elem(def);
+          if (summary_elem)
+          {
+            summary_elems.push(summary_elem);
+          }
         }
       }
       summ_div.replaceChildren(...summary_elems);
@@ -260,7 +286,8 @@ class Filter_Buddy extends HTMLElement
     {
       const delete_btn = document.createElement("button");
       delete_btn.addEventListener("click", () => this.OnClick_Del_Filter_Btn(def));
-      delete_btn.innerText = "Delete";
+      delete_btn.classList.add("fb_del_btn");
+      delete_btn.innerHTML = "&Cross;";
 
       span = document.createElement("span");
       if (def.text)
@@ -271,7 +298,7 @@ class Filter_Buddy extends HTMLElement
       {
         span.innerText = def.label + ": " + value;
       }
-      span.style.border = "1px solid red";
+      span.classList.add("fb_summ");
       span.append(delete_btn);
     }
 
@@ -304,29 +331,82 @@ class Filter_Buddy extends HTMLElement
 
   Render()
   {
+    const filter_svg = `
+      <svg 
+        class="fb_filter_img" 
+        aria-hidden="true" 
+        focusable="false" 
+        data-prefix="fas" 
+        data-icon="filter" 
+        class="svg-inline--fa fa-filter fa-w-16" 
+        role="img" 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 512 512">
+        <path 
+          fill="currentColor" 
+          d="M487.976 0H24.028C2.71 0-8.047 25.866 7.058 40.971L192 225.941V432c0 7.831 3.821 15.17 10.237 19.662l80 55.98C298.02 518.69 320 507.493 320 487.98V225.941l184.947-184.97C520.021 25.896 509.338 0 487.976 0z">
+        </path>
+      </svg>`;
     const html = `
+      <style>
+        .fb_del_btn
+        {
+          border: none;
+          background: none;
+          padding: 0;
+          margin: 0px 0px 0px 4px;
+          cursor: pointer;
+          font-size: 14px;
+          color: #888;
+          font-weight: bold;
+        }
+        .fb_summ
+        {
+          background-color: #ddd;
+          border-radius: 100px;
+          font-family: sans-serif;
+          font-size: 10px;
+          padding: 4px 6px;
+          margin: 0px 2px;
+        }
+        .fb_filter_btn
+        {
+          height: 22px;
+        }
+        .fb_filter_img
+        {
+          height: 8px;
+        }
+      </style>
+
       <button id="switchViewBtn">view</button>
       <span id="switchViewListPlaceholder"></span>
-      <button id="search_btn">Search</button>
 
-      <div id="min_view_div">
-        <button id="min_add_filter_btn">+</button>
-        <div id="min_summ_div"></div>
-      </div>
+      <span id="min_view_div">
+        <button id="min_add_filter_btn" class="fb_filter_btn">${filter_svg}</button>
+        <span id="min_summ_div"></span>
+        <button id="min_search_btn">&telrec;</button>
+      </span>
 
-      <div id="mid_view_div">
+      <span id="mid_view_div">
+        <span id="mid_filters_div"></span>
         <button id="mid_add_filter_btn">+</button>
-        <div id="mid_filters_div"></div>
+        <button id="mid_search_btn">Search</button>
         <div id="mid_summ_div"></div>
-      </div>
+      </span>
 
       <div id="max_view_div">
         <div id="max_filters_div"></div>
+        <button id="max_search_btn">Search</button>
       </div>
     `;
     const doc = Utils.toDocument(html);
 
-    const search_btn = doc.getElementById("search_btn");
+    let search_btn = doc.getElementById("min_search_btn");
+    search_btn.addEventListener("click", this.OnClick_Search_Btn);
+    search_btn = doc.getElementById("mid_search_btn");
+    search_btn.addEventListener("click", this.OnClick_Search_Btn);
+    search_btn = doc.getElementById("max_search_btn");
     search_btn.addEventListener("click", this.OnClick_Search_Btn);
 
     const min_add_filter_btn = doc.getElementById("min_add_filter_btn");
@@ -337,7 +417,6 @@ class Filter_Buddy extends HTMLElement
     this.min_view_div = doc.getElementById("min_view_div");
     this.mid_view_div = doc.getElementById("mid_view_div");
     this.max_view_div = doc.getElementById("max_view_div");
-    this.view = "min";
 
     this.switchViewBtn = doc.getElementById("switchViewBtn");
     this.switchViewBtn.addEventListener("click", this.OnClick_Switch_View_Btn);
