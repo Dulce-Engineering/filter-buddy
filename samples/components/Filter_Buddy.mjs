@@ -22,7 +22,7 @@ class Filter_Buddy extends HTMLElement
   {
     const rootElem = this.Render();
     this.replaceChildren(rootElem);
-    this.view = "min";
+    this.view = "max";
   }
 
   disconnectedCallback()
@@ -151,13 +151,25 @@ class Filter_Buddy extends HTMLElement
 
   // misc =========================================================================================
 
-  Have_Filters()
+  Has_Filters()
   {
     let res = false;
 
     if (!Utils.isEmpty(this.filter_defs))
     {
       res = this.filter_defs.some(def => def.value != undefined);
+    }
+
+    return res;
+  }
+
+  Has_Max_Filters()
+  {
+    let res = false;
+
+    if (!Utils.isEmpty(this.filter_defs))
+    {
+      res = this.filter_defs.some(def => def.in_mid_view != true);
     }
 
     return res;
@@ -243,7 +255,16 @@ class Filter_Buddy extends HTMLElement
       const min_search_btn = this.querySelector("#min_search_btn");
       if (min_search_btn)
       {
-        min_search_btn.hidden = !this.Have_Filters();
+        min_search_btn.hidden = !this.Has_Filters();
+      }
+    }
+
+    if (view_name == "mid")
+    {
+      const mid_add_filter_btn = this.querySelector("#mid_add_filter_btn");
+      if (mid_add_filter_btn)
+      {
+        mid_add_filter_btn.hidden = !this.Has_Max_Filters();
       }
     }
   }
@@ -377,6 +398,22 @@ class Filter_Buddy extends HTMLElement
         {
           height: 8px;
         }
+        #mid_filters_div
+        {
+          display: inline-flex;
+          gap: 5px;
+          font-family: sans-serif;
+          font-size: 12px;
+          align-items: center;
+        }
+        #mid_filters_div label
+        {
+          margin-left: 10px;
+        }
+        #mid_btn_span
+        {
+          margin-left: 10px;
+        }
       </style>
 
       <button id="switchViewBtn">view</button>
@@ -390,8 +427,10 @@ class Filter_Buddy extends HTMLElement
 
       <span id="mid_view_div">
         <span id="mid_filters_div"></span>
-        <button id="mid_add_filter_btn">+</button>
-        <button id="mid_search_btn">Search</button>
+        <span id="mid_btn_span">
+          <button id="mid_add_filter_btn" class="fb_filter_btn">${filter_svg}</button>
+          <button id="mid_search_btn">&telrec;</button>
+        </span>
         <div id="mid_summ_div"></div>
       </span>
 
