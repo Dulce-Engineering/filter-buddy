@@ -1,58 +1,61 @@
 <html>
   <head>
-    <script src="components/index.mjs" type="module"></script>
     <script type="module">
-      import Filter_Buddy from "./components/Filter_Buddy.mjs";
+      import Filter_Buddy from '/src/Filter_Buddy.mjs';
 
+      customElements.define(Filter_Buddy.name, Filter_Buddy);
       window.onload = Main;
 
       function Main()
       {
-        const filters = document.getElementById("filters");
-        filters.addEventListener("search", OnSearch_Filter);
-        filters.filters =
+        let fb;
+
+        fb = document.getElementById("fb_min");
+        fb.addEventListener("search", OnSearch_Filter);
+        const filters =
         [
           {
-            id: "WHERE_SOURCE",
-            label: "Source",
+            id: "NAME",
+            label: "Name",
             filter_class: Filter_Buddy.Text, 
-            in_mid_view: true
+            //in_mid_view: true
           },
           {
-            id: "WHERE_TAG",
-            label: "Tag",
+            id: "SEX",
+            label: "Sex",
             filter_class: Filter_Buddy.Select, 
             options:
             [
-              {value: 1, text: "one"},
-              {value: 2, text: "two"},
-              {value: 3, text: "three"},
+              {value: 1, text: "Female"},
+              {value: 2, text: "Male"},
+              {value: 3, text: "Other"},
             ],
-            in_mid_view: true
           },
           {
-            id: "WHERE_AGE",
+            id: "AGE",
             label: "Age",
             filter_class: Filter_Buddy.Number, 
-            in_mid_view: false
           },
           {
-            id: "WHERE_DATE",
-            label: "Date & Time",
+            id: "BIRTH",
+            label: "Tine of Birth",
             filter_class: Filter_Buddy.Date_Time, 
-            in_mid_view: false
           }
         ];
       }
 
       function OnSearch_Filter(event)
       {
-        const search = JSON.stringify(event.detail);
-        alert(search);
+        const result = JSON.stringify(event.detail);
+        document.getElementById("result").innerText = JSON.stringify(result);
       }
     </script>
   </head>
   <body>
-    <filter-buddy id="filters" view="mid"></filter-buddy>
+    <div><filter-buddy id="fb_min" view="min"></filter-buddy></div>
+    <div><filter-buddy id="fb_mid" view="mid"></filter-buddy></div>
+    <div><filter-buddy id="fb_max" view="max"></filter-buddy></div>
+    <div>Filter Result</div>
+    <textarea id="result" cols="100" rows="20"></textarea>
   </body>
 </html>

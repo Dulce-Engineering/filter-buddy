@@ -1,26 +1,5 @@
 class Utils
 {
-  static appendParam(params, paramName, paramValue)
-  {
-    return Utils.appendStr(params, paramName + "=" + paramValue, "&");
-  }
-
-  static Add_Param(url, param_name, param_Value)
-  {
-    if (param_Value)
-    {
-      let sep = "&";
-
-      if (!url.includes("?"))
-      {
-        sep = "?";
-      }
-      url = Utils.appendStr(url, param_name + "=" + param_Value, sep);
-    }
-
-    return url;
-  }
-
   static appendStr(a, b, sep)
   {
     let res = null;
@@ -42,6 +21,140 @@ class Utils
 
     return res;
   }
+
+  static addDays(date, days)
+  {
+    const res = new Date(date);
+    res.setDate(res.getDate() + days);
+
+    return res;
+  }
+
+  static nullIfEmpty(items)
+  {
+    let res = items;
+
+    if (Utils.isEmpty(items))
+    {
+      res = null;
+    }
+
+    return res;
+  }
+
+  static undefinedIfEmpty(items)
+  {
+    let res = items;
+
+    if (Utils.isEmpty(items))
+    {
+      res = undefined;
+    }
+
+    return res;
+  }
+
+  static isEmpty(items)
+  {
+    let res = false;
+
+    if (items == null || items == undefined)
+    {
+      res = true;
+    }
+    else if (Array.isArray(items))
+    {
+      if (items.length == 0)
+      {
+        res = true;
+      }
+    }
+    else if (typeof items == "string")
+    {
+      const str = items.trim();
+      if (str.length == 0 || str == "")
+      {
+        res = true;
+      }
+    }
+    else if (items.length == 0)
+    {
+      res = true;
+    }
+
+    return res;
+  }
+
+  static hasValue(data)
+  {
+    let res = true;
+    
+    if (data == undefined || data == null)
+    {
+      res = false;
+    }
+
+    return res;
+  }
+
+  static nowDateStr()
+  {
+    return Utils.toDateStr(new Date());
+  }
+
+  static nowTimeStr()
+  {
+    return Utils.toTimeStr(new Date());
+  }
+
+  static isJson(str)
+  {
+    return str?.startsWith("{") || str?.startsWith("[");
+  }
+
+  // HTML =========================================================================================
+
+  static Hide_Elem_If(root_elem, id, exp_fn)
+  {
+    const elem = root_elem.querySelector("#" + id);
+    if (elem)
+    {
+      elem.hidden = exp_fn();
+    }
+  }
+
+  static getFromLocalStorgeInt(key, defaultValue)
+  {
+    return parseInt(Utils.getFromLocalStorge(key, defaultValue));
+  }
+
+  static getFromLocalStorge(key, defaultValue)
+  {
+    let res = defaultValue;
+
+    const storageStr = localStorage.getItem(key);
+    if (!Utils.isEmpty(storageStr))
+    {
+      res = storageStr;
+    }
+
+    return res;
+  }
+
+  static appendStyles(id, css)
+  {
+    let style = document.getElementById(id);
+    if (!style)
+    {
+      style = document.createElement("style");
+      style.id = id;
+      style.innerHTML = css;
+      const head = document.getElementsByTagName("head")[0];
+      head.appendChild(style);
+    }
+  }
+  
+  // HTTP =========================================================================================
   
   static fetchPostJson(url, xApiKey, bodyObj, auth)
   {
@@ -119,153 +232,27 @@ class Utils
     return res;
   }
 
-  static addDays(date, days)
+  static appendParam(params, paramName, paramValue)
   {
-    const res = new Date(date);
-    res.setDate(res.getDate() + days);
-
-    return res;
+    return Utils.appendStr(params, paramName + "=" + paramValue, "&");
   }
 
-  static nullIfEmpty(items)
+  static Add_Param(url, param_name, param_Value)
   {
-    let res = items;
-
-    if (Utils.isEmpty(items))
+    if (param_Value)
     {
-      res = null;
-    }
+      let sep = "&";
 
-    return res;
-  }
-
-  static undefinedIfEmpty(items)
-  {
-    let res = items;
-
-    if (Utils.isEmpty(items))
-    {
-      res = undefined;
-    }
-
-    return res;
-  }
-
-  static isEmpty(items)
-  {
-    let res = false;
-
-    if (items == null || items == undefined)
-    {
-      res = true;
-    }
-    else if (Array.isArray(items))
-    {
-      if (items.length == 0)
+      if (!url.includes("?"))
       {
-        res = true;
+        sep = "?";
       }
-    }
-    else if (typeof items == "string")
-    {
-      const str = items.trim();
-      if (str.length == 0 || str == "")
-      {
-        res = true;
-      }
-    }
-    else if (items.length == 0)
-    {
-      res = true;
+      url = Utils.appendStr(url, param_name + "=" + param_Value, sep);
     }
 
-    return res;
+    return url;
   }
 
-  static getFromLocalStorgeInt(key, defaultValue)
-  {
-    return parseInt(Utils.getFromLocalStorge(key, defaultValue));
-  }
-
-  static getFromLocalStorge(key, defaultValue)
-  {
-    let res = defaultValue;
-
-    const storageStr = localStorage.getItem(key);
-    if (!Utils.isEmpty(storageStr))
-    {
-      res = storageStr;
-    }
-
-    return res;
-  }
-
-  static newMenuBtn(items, menuClass)
-  {
-    const btn = document.createElement("button");
-    btn.innerHTML = "&equiv;";
-    btn.style.marginBottom = "10px";
-    btn.style.marginRight = "10px";
-
-    const menuElem = new menuClass();
-    menuElem.setControlledByElement(btn);
-
-    menuElem.items.set(items);
-    if (menuClass.name == "NestedMenu")
-    {
-      for (let i = 0; i < items.length; i++)
-      {
-        const item = items[i];
-        if (item.items)
-        {
-          menuElem.items.atIndex(i).items.set(item.items);
-        }
-      }
-    }
-
-    return [btn, menuElem]; 
-  }
-
-  static hasValue(data)
-  {
-    let res = true;
-    
-    if (data == undefined || data == null)
-    {
-      res = false;
-    }
-
-    return res;
-  }
-
-  static nowDateStr()
-  {
-    return Utils.toDateStr(new Date());
-  }
-
-  static nowTimeStr()
-  {
-    return Utils.toTimeStr(new Date());
-  }
-
-  static appendStyles(id, css)
-  {
-    let style = document.getElementById(id);
-    if (!style)
-    {
-      style = document.createElement("style");
-      style.id = id;
-      style.innerHTML = css;
-      const head = document.getElementsByTagName("head")[0];
-      head.appendChild(style);
-    }
-  }
-
-  static isJson(str)
-  {
-    return str?.startsWith("{") || str?.startsWith("[");
-  }
-  
   // cast =========================================================================================
 
   static toEmptyStr(value)

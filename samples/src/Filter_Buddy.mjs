@@ -1,5 +1,5 @@
 import Utils from "./Utils.mjs";
-import ptDropdown from "./DE_Dropdown.mjs"
+//import ptDropdown from "./DE_Dropdown.mjs"
 
 class Filter_Buddy extends HTMLElement 
 {
@@ -170,13 +170,25 @@ class Filter_Buddy extends HTMLElement
 
   // misc =========================================================================================
 
-  Has_Filters()
+  Has_Filter_Values()
   {
     let res = false;
 
     if (!Utils.isEmpty(this.filter_defs))
     {
       res = this.filter_defs.some(def => def.value != undefined);
+    }
+
+    return res;
+  }
+
+  Has_Filters()
+  {
+    let res = false;
+
+    if (!Utils.isEmpty(this.filter_defs))
+    {
+      res = this.filter_defs.some(def => def.filter != undefined && def.filter != null);
     }
 
     return res;
@@ -286,29 +298,19 @@ class Filter_Buddy extends HTMLElement
 
     if (view_name == "min")
     {
-      const min_search_btn = this.querySelector("#min_search_btn");
-      if (min_search_btn)
-      {
-        min_search_btn.hidden = !this.Has_Filters();
-      }
+      Utils.Hide_Elem_If(this, "min_add_filter_btn", () => !this.Has_Filters());
+      Utils.Hide_Elem_If(this, "min_search_btn", () => !this.Has_Filter_Values());
     }
-
-    if (view_name == "mid")
+    else if (view_name == "mid")
     {
-      const mid_add_filter_btn = this.querySelector("#mid_add_filter_btn");
-      if (mid_add_filter_btn)
-      {
-        mid_add_filter_btn.hidden = !this.Has_Max_Filters();
-      }
+      Utils.Hide_Elem_If(this, "mid_add_filter_btn", () => !this.Has_Max_Filters());
+      Utils.Hide_Elem_If(this, "mid_search_btn", () => !this.Has_Filter_Values());
     }
-
-    if (view_name == "max")
+    else if (view_name == "max")
     {
-      const max_cancel_btn = this.querySelector("#max_cancel_btn");
-      if (max_cancel_btn)
-      {
-        max_cancel_btn.hidden = !this.show_cancel_btn;
-      }
+      Utils.Hide_Elem_If(this, "max_clear_btn", () => !this.Has_Filters());
+      Utils.Hide_Elem_If(this, "max_search_btn", () => !this.Has_Filters());
+      Utils.Hide_Elem_If(this, "max_cancel_btn", () => !this.show_cancel_btn);
     }
   }
 
@@ -414,79 +416,82 @@ class Filter_Buddy extends HTMLElement
           d="M487.976 0H24.028C2.71 0-8.047 25.866 7.058 40.971L192 225.941V432c0 7.831 3.821 15.17 10.237 19.662l80 55.98C298.02 518.69 320 507.493 320 487.98V225.941l184.947-184.97C520.021 25.896 509.338 0 487.976 0z">
         </path>
       </svg>`;
+    const css = `
+      .fb_del_btn
+      {
+        border: none;
+        background: none;
+        padding: 0;
+        margin: 0px 0px 0px 4px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #888;
+        font-weight: bold;
+      }
+      .fb_summ
+      {
+        background-color: #ddd;
+        border-radius: 100px;
+        font-family: sans-serif;
+        font-size: 10px;
+        padding: 4px 6px;
+        margin: 0px 2px;
+      }
+      .fb_filter_btn
+      {
+        height: 22px;
+      }
+      .fb_filter_img
+      {
+        height: 8px;
+      }
+      #mid_filters_div
+      {
+        display: inline-flex;
+        gap: 5px;
+        font-family: sans-serif;
+        font-size: 12px;
+        align-items: center;
+      }
+      #mid_filters_div label
+      {
+        margin-left: 10px;
+      }
+      #mid_btn_span
+      {
+        margin-left: 10px;
+      }
+      #max_view_body
+      {
+        font-family: sans-serif;
+        font-size: 12px;
+        display: inline-block;
+      }
+      #max_btn_div
+      {
+        justify-content: flex-end;
+        display: flex;
+        gap: 5px;
+        margin-top: 5px;
+      }
+      #max_filters_div
+      {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr 2fr;
+        gap: 5px;
+      }
+      #max_filters_div label
+      {
+        justify-self: end;
+      }
+      #mid_summ_div
+      {
+        margin: 5px 0px 0px 10px;
+      }
+    `;
     const html = `
       <style>
-        .fb_del_btn
-        {
-          border: none;
-          background: none;
-          padding: 0;
-          margin: 0px 0px 0px 4px;
-          cursor: pointer;
-          font-size: 14px;
-          color: #888;
-          font-weight: bold;
-        }
-        .fb_summ
-        {
-          background-color: #ddd;
-          border-radius: 100px;
-          font-family: sans-serif;
-          font-size: 10px;
-          padding: 4px 6px;
-          margin: 0px 2px;
-        }
-        .fb_filter_btn
-        {
-          height: 22px;
-        }
-        .fb_filter_img
-        {
-          height: 8px;
-        }
-        #mid_filters_div
-        {
-          display: inline-flex;
-          gap: 5px;
-          font-family: sans-serif;
-          font-size: 12px;
-          align-items: center;
-        }
-        #mid_filters_div label
-        {
-          margin-left: 10px;
-        }
-        #mid_btn_span
-        {
-          margin-left: 10px;
-        }
-        #max_view_body
-        {
-          font-family: sans-serif;
-          font-size: 12px;
-          display: inline-block;
-        }
-        #max_btn_div
-        {
-          justify-content: flex-end;
-          display: flex;
-          gap: 5px;
-          margin-top: 5px;
-        }
-        #max_filters_div
-        {
-          display: grid;
-          grid-template-columns: 1fr 2fr 1fr 2fr;
-          gap: 5px;
-        }
-        #max_filters_div label
-        {
-          justify-self: end;
-        }
-        #mid_summ_div
-        {
-          margin: 5px 0px 0px 10px;
-        }
+        ${css}
       </style>
 
       <!--button id="switch_view_btn">view</button>
