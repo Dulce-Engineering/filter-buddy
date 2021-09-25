@@ -11,6 +11,7 @@ class Filter_Buddy extends HTMLElement
   {
     super();
 
+    this.attachShadow({mode: "open"});
     this.init_view = "min";
 
     this.OnClick_Switch_View_Btn = this.OnClick_Switch_View_Btn.bind(this);
@@ -26,7 +27,7 @@ class Filter_Buddy extends HTMLElement
   connectedCallback()
   {
     const rootElem = this.Render();
-    this.replaceChildren(rootElem);
+    this.shadowRoot.append(rootElem);
     this.view = this.init_view;
   }
 
@@ -40,12 +41,16 @@ class Filter_Buddy extends HTMLElement
 
   }
 
-  static observedAttributes = ["view"];
+  static observedAttributes = ["view", "style-src"];
   attributeChangedCallback(attrName, oldValue, newValue)
   {
     if (attrName == "view")
     {
       this.init_view = newValue;
+    }
+    else if (attrName == "style-src")
+    {
+      this.style_src = newValue;
     }
   }
 
@@ -293,6 +298,11 @@ class Filter_Buddy extends HTMLElement
     return defs;
   }
 
+  Get_Elem_By_Id(id)
+  {
+    return this.shadowRoot.getElementById(id);
+  }
+
   // rendering ====================================================================================
 
   Show_View_With_Data(view_name)
@@ -338,7 +348,7 @@ class Filter_Buddy extends HTMLElement
   Render_Update_Summ()
   {
     const view = this.view;
-    const summ_div = this.querySelector("#" + view + "_summ_div");
+    const summ_div = this.Get_Elem_By_Id(view + "_summ_div");
     if (summ_div)
     {
       const summary_elems = [];
@@ -409,7 +419,7 @@ class Filter_Buddy extends HTMLElement
         filter_def[view + "_filter"] = filter;
       }
       
-      const filters_div = this.querySelector("#" + filters_div_id);
+      const filters_div = this.Get_Elem_By_Id(filters_div_id);
       filters_div.replaceChildren(...elems.flat());
     }
   }
@@ -437,83 +447,87 @@ class Filter_Buddy extends HTMLElement
           d="M487.976 0H24.028C2.71 0-8.047 25.866 7.058 40.971L192 225.941V432c0 7.831 3.821 15.17 10.237 19.662l80 55.98C298.02 518.69 320 507.493 320 487.98V225.941l184.947-184.97C520.021 25.896 509.338 0 487.976 0z">
         </path>
       </svg>`;
-    const css = `
-      .fb_del_btn
-      {
-        border: none;
-        background: none;
-        padding: 0;
-        margin: 0px 0px 0px 4px;
-        cursor: pointer;
-        font-size: 14px;
-        color: #888;
-        font-weight: bold;
-      }
-      .fb_summ
-      {
-        background-color: #ddd;
-        border-radius: 100px;
-        font-family: sans-serif;
-        font-size: 10px;
-        padding: 4px 6px;
-        margin: 0px 2px;
-      }
-      .fb_filter_btn
-      {
-        height: 22px;
-      }
-      .fb_filter_img
-      {
-        height: 8px;
-      }
-      #mid_filters_div
-      {
-        display: inline-flex;
-        gap: 5px;
-        font-family: sans-serif;
-        font-size: 12px;
-        align-items: center;
-      }
-      #mid_filters_div label
-      {
-        margin-left: 10px;
-      }
-      #mid_btn_span
-      {
-        margin-left: 10px;
-      }
-      #max_view_body
-      {
-        font-family: sans-serif;
-        font-size: 12px;
-        display: inline-block;
-      }
-      #max_btn_div
-      {
-        justify-content: flex-end;
-        display: flex;
-        gap: 5px;
-        margin-top: 5px;
-      }
-      #max_filters_div
-      {
-        display: grid;
-        grid-template-columns: 1fr 2fr 1fr 2fr;
-        gap: 5px;
-      }
-      #max_filters_div label
-      {
-        justify-self: end;
-      }
-      #mid_summ_div
-      {
-        margin: 5px 0px 0px 10px;
-      }
-    `;
-    const html = `
+    let style = `
       <style>
-        ${css}
+        .fb_del_btn
+        {
+          border: none;
+          background: none;
+          padding: 0;
+          margin: 0px 0px 0px 4px;
+          cursor: pointer;
+          font-size: 14px;
+          color: #888;
+          font-weight: bold;
+        }
+        .fb_summ
+        {
+          background-color: #ddd;
+          border-radius: 100px;
+          font-family: sans-serif;
+          font-size: 10px;
+          padding: 4px 6px;
+          margin: 0px 2px;
+        }
+        .fb_filter_btn
+        {
+          height: 22px;
+        }
+        .fb_filter_img
+        {
+          height: 8px;
+        }
+        #mid_filters_div
+        {
+          display: inline-flex;
+          gap: 5px;
+          font-family: sans-serif;
+          font-size: 12px;
+          align-items: center;
+        }
+        #mid_filters_div label
+        {
+          margin-left: 10px;
+        }
+        #mid_btn_span
+        {
+          margin-left: 10px;
+        }
+        #max_view_body
+        {
+          font-family: sans-serif;
+          font-size: 12px;
+          display: inline-block;
+        }
+        #max_btn_div
+        {
+          justify-content: flex-end;
+          display: flex;
+          gap: 5px;
+          margin-top: 5px;
+        }
+        #max_filters_div
+        {
+          display: grid;
+          grid-template-columns: 1fr 2fr 1fr 2fr;
+          gap: 5px;
+        }
+        #max_filters_div label
+        {
+          justify-self: end;
+        }
+        #mid_summ_div
+        {
+          margin: 5px 0px 0px 10px;
+        }
       </style>
+    `;
+    if (this.style_src)
+    {
+      style = "<link rel=\"stylesheet\" href=\"" + this.style_src + "\"></link>";
+    }
+    const html = `
+      ${style}
 
       <!--button id="switch_view_btn">view</button>
       <span id="switch_view_list_placeholder"></span-->

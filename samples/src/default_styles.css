@@ -1,0 +1,71 @@
+.fb_del_btn
+{
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0px 0px 0px 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #888;
+  font-weight: bold;
+}
+.fb_summ
+{
+  background-color: #ddd;
+  border-radius: 100px;
+  font-family: sans-serif;
+  font-size: 10px;
+  padding: 4px 6px;
+  margin: 0px 2px;
+}
+.fb_filter_btn
+{
+  height: 22px;
+}
+.fb_filter_img
+{
+  height: 8px;
+}
+#mid_filters_div
+{
+  display: inline-flex;
+  gap: 5px;
+  font-family: sans-serif;
+  font-size: 12px;
+  align-items: center;
+}
+#mid_filters_div label
+{
+  margin-left: 10px;
+}
+#mid_btn_span
+{
+  margin-left: 10px;
+}
+#max_view_body
+{
+  font-family: sans-serif;
+  font-size: 12px;
+  display: inline-block;
+}
+#max_btn_div
+{
+  justify-content: flex-end;
+  display: flex;
+  gap: 5px;
+  margin-top: 5px;
+}
+#max_filters_div
+{
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 2fr;
+  gap: 5px;
+}
+#max_filters_div label
+{
+  justify-self: end;
+}
+#mid_summ_div
+{
+  margin: 5px 0px 0px 10px;
+}
