@@ -14,7 +14,7 @@ Filter Buddy allows me to easily define filter options for frontend components, 
 ## Full-Size View
 - Shows every filter a user may set.
 
-### Sample Imge
+### Sample Image
 ![alt text](
 https://github.com/Dulce-Engineering/filter-buddy/blob/main/images/samples.png?raw=true)
 
