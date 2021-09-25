@@ -77,6 +77,11 @@ class Utils
         res = true;
       }
     }
+    else if (typeof items == "object")
+    {
+      const keys = Object.keys(items);
+      res = keys.length == 0;
+    }
     else if (items.length == 0)
     {
       res = true;
@@ -110,6 +115,19 @@ class Utils
   static isJson(str)
   {
     return str?.startsWith("{") || str?.startsWith("[");
+  }
+
+  static Deep_Copy(obj)
+  {
+    let res;
+
+    if (!Utils.Is_Empty(obj))
+    {
+      const JSON_Str = JSON.stringify(obj);
+      res = JSON.parse(JSON_Str);
+    }
+
+    return res;
   }
 
   // HTML =========================================================================================

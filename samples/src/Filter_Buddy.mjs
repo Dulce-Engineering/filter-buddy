@@ -57,7 +57,7 @@ class Filter_Buddy extends HTMLElement
   
   set filters(filter_defs)
   {
-    this.filter_defs = filter_defs;
+    this.filter_defs = this.Copy_Defs(filter_defs);
     this.Render_View(this.mid_filter_defs, "mid_filters_div", "mid");
     this.Render_View(this.filter_defs, "max_filters_div", "max");
     this.Show_View();
@@ -170,6 +170,23 @@ class Filter_Buddy extends HTMLElement
 
   // misc =========================================================================================
 
+  Copy_Defs(defs)
+  {
+    let res;
+
+    if (!Utils.Is_Empty(defs))
+    {
+      res = [];
+      for (const def of defs)
+      {
+        const new_def = {...def};
+        res.push(new_def);
+      }
+    }
+
+    return res;
+  }
+
   Has_Filter_Values()
   {
     let res = false;
@@ -242,17 +259,21 @@ class Filter_Buddy extends HTMLElement
 
   Get_Data()
   {
-    const res = {};
+    let res;
 
     if (!Utils.Is_Empty(this.filter_defs))
     {
+      res = {};
       for (const def of this.filter_defs)
       {
-        res[def.id] = def.value;
+        if (def.value != undefined)
+        {
+          res[def.id] = def.value;
+        }
       }
     }
 
-    return res;
+    return Utils.nullIfEmpty(res);
   }
 
   Get_Current_Defs()
@@ -304,7 +325,7 @@ class Filter_Buddy extends HTMLElement
     else if (view_name == "mid")
     {
       Utils.Hide_Elem_If(this, "mid_add_filter_btn", () => !this.Has_Max_Filters());
-      Utils.Hide_Elem_If(this, "mid_search_btn", () => !this.Has_Filter_Values());
+      //Utils.Hide_Elem_If(this, "mid_search_btn", () => !this.Has_Filter_Values());
     }
     else if (view_name == "max")
     {
