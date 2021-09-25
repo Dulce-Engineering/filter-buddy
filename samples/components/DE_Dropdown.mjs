@@ -112,7 +112,7 @@ class DE_Dropdown extends HTMLElement
       y = rect.bottom;
     }
 
-    if (!Utils.isEmpty(window.ptDropdowns))
+    if (!Utils.Is_Empty(window.ptDropdowns))
     {
       for (const ptDropdown of window.ptDropdowns)
       {
@@ -120,7 +120,7 @@ class DE_Dropdown extends HTMLElement
       }
     }
 
-    if (!Utils.hasValue(window.ptDropdowns))
+    if (!Utils.Has_Value(window.ptDropdowns))
     {
       window.ptDropdowns = [];
     }

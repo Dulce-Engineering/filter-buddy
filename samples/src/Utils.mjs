@@ -34,7 +34,7 @@ class Utils
   {
     let res = items;
 
-    if (Utils.isEmpty(items))
+    if (Utils.Is_Empty(items))
     {
       res = null;
     }
@@ -46,7 +46,7 @@ class Utils
   {
     let res = items;
 
-    if (Utils.isEmpty(items))
+    if (Utils.Is_Empty(items))
     {
       res = undefined;
     }
@@ -54,7 +54,7 @@ class Utils
     return res;
   }
 
-  static isEmpty(items)
+  static Is_Empty(items)
   {
     let res = false;
 
@@ -85,7 +85,7 @@ class Utils
     return res;
   }
 
-  static hasValue(data)
+  static Has_Value(data)
   {
     let res = true;
     
@@ -133,7 +133,7 @@ class Utils
     let res = defaultValue;
 
     const storageStr = localStorage.getItem(key);
-    if (!Utils.isEmpty(storageStr))
+    if (!Utils.Is_Empty(storageStr))
     {
       res = storageStr;
     }
@@ -397,7 +397,7 @@ class Utils
   {
     let res = def;
 
-    if (Utils.hasValue(value))
+    if (Utils.Has_Value(value))
     {
       const intValue = parseInt(value);
       if (!isNaN(intValue))

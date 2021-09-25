@@ -1,5 +1,18 @@
 <html>
   <head>
+    <style>
+      body
+      {
+        font-family: sans-serif;
+        padding: 10px;
+      }
+      .filter
+      {
+        background-color: #eef;
+        padding: 5px;
+        margin: 5px 0px 20px 0px;
+      }
+    </style>
     <script type="module">
       import Filter_Buddy from '/src/Filter_Buddy.mjs';
 
@@ -9,20 +22,18 @@
       function Main()
       {
         let fb;
-
-        fb = document.getElementById("fb_min");
-        fb.addEventListener("search", OnSearch_Filter);
         const filters =
         [
           {
             id: "NAME",
             label: "Name",
+            in_mid_view: true,
             filter_class: Filter_Buddy.Text, 
-            //in_mid_view: true
           },
           {
             id: "SEX",
             label: "Sex",
+            in_mid_view: true,
             filter_class: Filter_Buddy.Select, 
             options:
             [
@@ -38,24 +49,40 @@
           },
           {
             id: "BIRTH",
-            label: "Tine of Birth",
+            label: "Time of Birth",
             filter_class: Filter_Buddy.Date_Time, 
           }
         ];
+
+        fb = document.getElementById("fb_min");
+        fb.addEventListener("search", OnSearch_Filter);
+        fb.filters = filters;
+
+        fb = document.getElementById("fb_mid");
+        fb.addEventListener("search", OnSearch_Filter);
+        fb.filters = filters;
+
+        fb = document.getElementById("fb_max");
+        fb.addEventListener("search", OnSearch_Filter);
+        fb.filters = filters;
       }
 
       function OnSearch_Filter(event)
       {
-        const result = JSON.stringify(event.detail);
-        document.getElementById("result").innerText = JSON.stringify(result);
+        const result_str = JSON.stringify(event.detail);
+        const elem = document.getElementById("result");
+        elem.innerText = result_str;
       }
     </script>
   </head>
   <body>
-    <div><filter-buddy id="fb_min" view="min"></filter-buddy></div>
-    <div><filter-buddy id="fb_mid" view="mid"></filter-buddy></div>
-    <div><filter-buddy id="fb_max" view="max"></filter-buddy></div>
-    <div>Filter Result</div>
-    <textarea id="result" cols="100" rows="20"></textarea>
+    <label>Minimal Filter</label>
+    <div class="filter"><filter-buddy id="fb_min" view="min"></filter-buddy></div>
+    <label>Minimal with Default Filters</label>
+    <div class="filter"><filter-buddy id="fb_mid" view="mid"></filter-buddy></div>
+    <label>Full-Size Filter</label>
+    <div class="filter"><filter-buddy id="fb_max" view="max"></filter-buddy></div>
+    <label>Filter Result: </label>
+    <div id="result" class="filter" style="min-height:100px;"></div>
   </body>
 </html>

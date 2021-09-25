@@ -149,7 +149,7 @@ class Filter_Buddy extends HTMLElement
 
   OnClick_Max_Clear_Btn()
   {
-    if (!Utils.isEmpty(this.filter_defs))
+    if (!Utils.Is_Empty(this.filter_defs))
     {
       for (const def of this.filter_defs)
       {
@@ -174,7 +174,7 @@ class Filter_Buddy extends HTMLElement
   {
     let res = false;
 
-    if (!Utils.isEmpty(this.filter_defs))
+    if (!Utils.Is_Empty(this.filter_defs))
     {
       res = this.filter_defs.some(def => def.value != undefined);
     }
@@ -186,9 +186,9 @@ class Filter_Buddy extends HTMLElement
   {
     let res = false;
 
-    if (!Utils.isEmpty(this.filter_defs))
+    if (!Utils.Is_Empty(this.filter_defs))
     {
-      res = this.filter_defs.some(def => def.filter != undefined && def.filter != null);
+      res = this.filter_defs.some(def => Utils.Has_Value(def.filter_class));
     }
 
     return res;
@@ -198,7 +198,7 @@ class Filter_Buddy extends HTMLElement
   {
     let res = false;
 
-    if (!Utils.isEmpty(this.filter_defs))
+    if (!Utils.Is_Empty(this.filter_defs))
     {
       res = this.filter_defs.some(def => def.in_mid_view != true);
     }
@@ -211,7 +211,7 @@ class Filter_Buddy extends HTMLElement
     const view = this.view;
 
     const defs = this.Get_Current_Defs();
-    if (!Utils.isEmpty(defs))
+    if (!Utils.Is_Empty(defs))
     {
       for (const def of defs)
       {
@@ -230,7 +230,7 @@ class Filter_Buddy extends HTMLElement
     const view = this.view;
 
     const defs = this.Get_Current_Defs();
-    if (!Utils.isEmpty(defs))
+    if (!Utils.Is_Empty(defs))
     {
       for (const def of defs)
       {
@@ -244,7 +244,7 @@ class Filter_Buddy extends HTMLElement
   {
     const res = {};
 
-    if (!Utils.isEmpty(this.filter_defs))
+    if (!Utils.Is_Empty(this.filter_defs))
     {
       for (const def of this.filter_defs)
       {
@@ -323,7 +323,7 @@ class Filter_Buddy extends HTMLElement
       const summary_elems = [];
 
       let defs = this.filter_defs;
-      if (!Utils.isEmpty(defs))
+      if (!Utils.Is_Empty(defs))
       {
         if (view == "mid")
         {
@@ -331,7 +331,7 @@ class Filter_Buddy extends HTMLElement
         }
       }
 
-      if (!Utils.isEmpty(defs))
+      if (!Utils.Is_Empty(defs))
       {
         for (const def of defs)
         {
@@ -376,7 +376,7 @@ class Filter_Buddy extends HTMLElement
 
   Render_View(filter_defs, filters_div_id, view)
   {
-    if (!Utils.isEmpty(filter_defs))
+    if (!Utils.Is_Empty(filter_defs))
     {
       const elems = [];
       for (const filter_def of filter_defs)
@@ -579,7 +579,7 @@ class Text
   set value(input_value)
   {
     this.input.value = "";
-    if (!Utils.isEmpty(input_value))
+    if (!Utils.Is_Empty(input_value))
     {
       this.input.value = input_value;
     }
@@ -590,7 +590,7 @@ class Text
     let res;
 
     const input_value = this.input.value;
-    if (!Utils.isEmpty(input_value))
+    if (!Utils.Is_Empty(input_value))
     {
       res = input_value;
     }
@@ -622,7 +622,7 @@ class Select
   set value(input_value)
   {
     this.select.value = "";
-    if (!Utils.isEmpty(input_value))
+    if (!Utils.Is_Empty(input_value))
     {
       this.select.value = input_value;
     }
@@ -646,7 +646,7 @@ class Select
     let res;
 
     const input_value = this.select.value;
-    if (!Utils.isEmpty(input_value))
+    if (!Utils.Is_Empty(input_value))
     {
       res = input_value;
     }
@@ -686,7 +686,7 @@ class Number
   set value(input_value)
   {
     this.input.value = "";
-    if (!Utils.isEmpty(input_value))
+    if (!Utils.Is_Empty(input_value))
     {
       input_value = parseInt(input_value);
       if (isNaN(input_value))
@@ -702,7 +702,7 @@ class Number
     let res;
 
     const input_value = this.input.value;
-    if (!Utils.isEmpty(input_value))
+    if (!Utils.Is_Empty(input_value))
     {
       res = parseInt(input_value);
       if (isNaN(res))
@@ -739,7 +739,7 @@ class Date_Time
   set value(input_value)
   {
     this.input.value = "";
-    if (!Utils.isEmpty(input_value))
+    if (!Utils.Is_Empty(input_value))
     {
       this.input.value = input_value;
     }
@@ -750,7 +750,7 @@ class Date_Time
     let res;
 
     const input_value = this.input.value;
-    if (!Utils.isEmpty(input_value))
+    if (!Utils.Is_Empty(input_value))
     {
       res = input_value;
     }
