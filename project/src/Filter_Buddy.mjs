@@ -134,10 +134,7 @@ class Filter_Buddy extends HTMLElement
 
   OnClick_Search_Btn()
   {
-    this.Get_View_Data();
-    const filter_data = this.Get_Data();
-    const search_event = new CustomEvent("search", {detail: filter_data});
-    this.dispatchEvent(search_event);
+    this.Do_Search();
 
     if (this.return_view)
     {
@@ -150,6 +147,7 @@ class Filter_Buddy extends HTMLElement
   {
     def.value = undefined;
     this.Render_Update_Summ();
+    this.Do_Search();
   }
 
   OnClick_Max_Clear_Btn()
@@ -174,6 +172,14 @@ class Filter_Buddy extends HTMLElement
   }
 
   // misc =========================================================================================
+
+  Do_Search()
+  {
+    this.Get_View_Data();
+    const filter_data = this.Get_Data();
+    const search_event = new CustomEvent("search", {detail: filter_data});
+    this.dispatchEvent(search_event);
+  }
 
   Copy_Defs(defs)
   {
