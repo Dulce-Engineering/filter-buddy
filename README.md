@@ -1,5 +1,5 @@
 # Filter Buddy
-Filter Buddy allows me to easily define filter options for frontend components, like tables. Three display modes allow me to display filter options as a single filter button, a set of visible filters with additional hidden, or all filters immediately visible. When a user clicks "search", Filter Buddy returns a single object with all filter values which can be passed to a backend or client-side table component.
+Filter Buddy allows one to easily define filter options for frontend components like tables. Three display modes allow one to display filter options as a single filter button, a set of visible filters with additional hidden, or all filters immediately visible. When a user clicks "search", Filter Buddy returns a single object with all filter values which can be passed to a backend or client-side table component. Filter Buddy is written as a JavaScript Web Component with no dependencies.
 
 ## Minimal View
 - Shows a filter button through which a user may add filters.
