@@ -13,6 +13,7 @@ class Filter_Buddy extends HTMLElement
 
     this.attachShadow({mode: "open"});
     this.init_view = "min";
+    this.search_btn_html = "&telrec;";
 
     this.OnClick_Switch_View_Btn = this.OnClick_Switch_View_Btn.bind(this);
     this.OnClick_Set_View = this.OnClick_Set_View.bind(this);
@@ -22,13 +23,12 @@ class Filter_Buddy extends HTMLElement
     this.OnClick_Del_Filter_Btn = this.OnClick_Del_Filter_Btn.bind(this);
     this.OnClick_Max_Clear_Btn = this.OnClick_Max_Clear_Btn.bind(this);
     this.OnClick_Max_Cancel_Btn = this.OnClick_Max_Cancel_Btn.bind(this);
+    this.Do_Search = this.Do_Search.bind(this);
   }
 
   connectedCallback()
   {
-    const rootElem = this.Render();
-    this.shadowRoot.append(rootElem);
-    this.view = this.init_view;
+    this.Render();
   }
 
   disconnectedCallback()
@@ -104,6 +104,13 @@ class Filter_Buddy extends HTMLElement
     }
 
     return res;
+  }
+
+  set srch_btn_html(search_btn_html)
+  {
+    this.search_btn_html = search_btn_html;
+    this.shadowRoot.getElementById("min_search_btn").innerHTML = this.search_btn_html;
+    this.shadowRoot.getElementById("mid_search_btn").innerHTML = this.search_btn_html;
   }
 
   // events =======================================================================================
@@ -335,19 +342,19 @@ class Filter_Buddy extends HTMLElement
 
     if (view_name == "min")
     {
-      Utils.Hide_Elem_If(this, "min_add_filter_btn", () => !this.Has_Filters());
-      Utils.Hide_Elem_If(this, "min_search_btn", () => !this.Has_Filter_Values());
+      Utils.Hide_Elem_If(this.min_view_div, "min_add_filter_btn", () => !this.Has_Filters());
+      Utils.Hide_Elem_If(this.min_view_div, "min_search_btn", () => !this.Has_Filter_Values());
     }
     else if (view_name == "mid")
     {
-      Utils.Hide_Elem_If(this, "mid_add_filter_btn", () => !this.Has_Max_Filters());
+      Utils.Hide_Elem_If(this.mid_view_div, "mid_add_filter_btn", () => !this.Has_Max_Filters());
       //Utils.Hide_Elem_If(this, "mid_search_btn", () => !this.Has_Filter_Values());
     }
     else if (view_name == "max")
     {
-      Utils.Hide_Elem_If(this, "max_clear_btn", () => !this.Has_Filters());
-      Utils.Hide_Elem_If(this, "max_search_btn", () => !this.Has_Filters());
-      Utils.Hide_Elem_If(this, "max_cancel_btn", () => !this.show_cancel_btn);
+      Utils.Hide_Elem_If(this.max_view_div, "max_clear_btn", () => !this.Has_Filters());
+      Utils.Hide_Elem_If(this.max_view_div, "max_search_btn", () => !this.Has_Filters());
+      Utils.Hide_Elem_If(this.max_view_div, "max_cancel_btn", () => !this.show_cancel_btn);
     }
   }
 
@@ -418,7 +425,7 @@ class Filter_Buddy extends HTMLElement
       const elems = [];
       for (const filter_def of filter_defs)
       {
-        const filter = new filter_def.filter_class(filter_def);
+        const filter = new filter_def.filter_class(filter_def, this);
         const filter_elems = filter.Render();
         elems.push(filter_elems);
 
@@ -541,14 +548,14 @@ class Filter_Buddy extends HTMLElement
       <span id="min_view_div">
         <button id="min_add_filter_btn" class="fb_filter_btn">${filter_svg}</button>
         <span id="min_summ_div"></span>
-        <button id="min_search_btn">&telrec;</button>
+        <button id="min_search_btn">${this.search_btn_html}</button>
       </span>
 
       <span id="mid_view_div">
         <span id="mid_filters_div"></span>
         <span id="mid_btn_span">
           <button id="mid_add_filter_btn" class="fb_filter_btn">${filter_svg}</button>
-          <button id="mid_search_btn">&telrec;</button>
+          <button id="mid_search_btn">${this.search_btn_html}</button>
         </span>
         <div id="mid_summ_div"></div>
       </span>
@@ -605,16 +612,18 @@ class Filter_Buddy extends HTMLElement
     switch_view_list.srcElem = this.switch_view_btn;
     switch_view_list.style.width = "100px";
     doc.getElementById("switch_view_list_placeholder").append(switch_view_list);*/
-
-    return doc;
+    
+    this.shadowRoot.append(doc);
+    this.view = this.init_view;
   }
 }
 
 class Text
 {
-  constructor(def)
+  constructor(def, ctx)
   {
     this.def = def;
+    this.ctx = ctx;
   }
 
   set value(input_value)
@@ -643,10 +652,16 @@ class Text
   {
     this.input = document.createElement("input");
     this.input.id = "ptFilter_" + this.def.id;
+    this.input.placeholder = this.def.placeholder;
 
     this.label = document.createElement("label");
     this.label.for = this.input.id;
     this.label.innerText = this.def.label;
+
+    if (this.def.auto_search)
+    {
+      this.input.addEventListener("change", this.ctx.Do_Search);
+    }
 
     return [this.label, this.input];
   }
@@ -655,9 +670,10 @@ Filter_Buddy.Text = Text;
 
 class Select
 {
-  constructor(def)
+  constructor(def, ctx)
   {
     this.def = def;
+    this.ctx = ctx;
   }
 
   set value(input_value)
@@ -711,6 +727,11 @@ class Select
     this.label = document.createElement("label");
     this.label.for = this.select.id;
     this.label.innerText = this.def.label;
+
+    if (this.def.auto_search)
+    {
+      this.select.addEventListener("change", this.ctx.Do_Search);
+    }
 
     return [this.label, this.select];
   }
