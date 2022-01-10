@@ -2,7 +2,7 @@ import Utils from "./Utils.mjs";
 
 class DE_Dropdown extends HTMLElement 
 {
-  static name = "de-dropdown";
+  static tname = "de-dropdown";
 
   constructor() 
   {
