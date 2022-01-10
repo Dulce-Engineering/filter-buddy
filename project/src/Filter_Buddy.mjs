@@ -3,7 +3,7 @@ import Utils from "./Utils.mjs";
 
 class Filter_Buddy extends HTMLElement 
 {
-  static name = "filter-buddy";
+  static tname = "filter-buddy";
 
   // lifecycle ====================================================================================
 
