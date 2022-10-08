@@ -12,7 +12,7 @@ class Filter_Buddy extends HTMLElement
     super();
 
     this.attachShadow({mode: "open"});
-    this.init_view = "min";
+    this.setAttribute("view", "min");
     this.search_btn_html = "&telrec;";
 
     this.OnClick_Switch_View_Btn = this.OnClick_Switch_View_Btn.bind(this);
@@ -41,17 +41,9 @@ class Filter_Buddy extends HTMLElement
 
   }
 
-  static observedAttributes = ["view", "style-src"];
+  //static observedAttributes = ["style-src"];
   attributeChangedCallback(attrName, oldValue, newValue)
   {
-    if (attrName == "view")
-    {
-      this.init_view = newValue;
-    }
-    else if (attrName == "style-src")
-    {
-      this.style_src = newValue;
-    }
   }
 
   // fields =======================================================================================
@@ -152,7 +144,7 @@ class Filter_Buddy extends HTMLElement
 
   OnClick_Del_Filter_Btn(def)
   {
-    def.value = undefined;
+    def.value = null;
     this.Render_Update_Summ();
     this.Do_Search();
   }
@@ -163,7 +155,7 @@ class Filter_Buddy extends HTMLElement
     {
       for (const def of this.filter_defs)
       {
-        def.value = undefined;
+        def.value = null;
       }
     }
     this.Set_View_Data();
@@ -211,7 +203,7 @@ class Filter_Buddy extends HTMLElement
 
     if (!Utils.Is_Empty(this.filter_defs))
     {
-      res = this.filter_defs.some(def => def.value != undefined);
+      res = this.filter_defs.some(def => def.value != null);
     }
 
     return res;
@@ -284,7 +276,7 @@ class Filter_Buddy extends HTMLElement
       res = {};
       for (const def of this.filter_defs)
       {
-        if (def.value != undefined)
+        if (def.value != null)
         {
           res[def.id] = def.value;
         }
@@ -535,9 +527,9 @@ class Filter_Buddy extends HTMLElement
         }
       </style>
     `;
-    if (this.style_src)
+    if (this.hasAttribute("style-src"))
     {
-      style = "<link rel=\"stylesheet\" href=\"" + this.style_src + "\"></link>";
+      style = "<link rel=\"stylesheet\" href=\"" + this.getAttribute("style-src") + "\"></link>";
     }
     const html = `
       ${style}
@@ -614,7 +606,7 @@ class Filter_Buddy extends HTMLElement
     doc.getElementById("switch_view_list_placeholder").append(switch_view_list);*/
     
     this.shadowRoot.append(doc);
-    this.view = this.init_view;
+    this.view = this.getAttribute("view");
   }
 }
 
@@ -652,7 +644,7 @@ class Text
   {
     this.input = document.createElement("input");
     this.input.id = "ptFilter_" + this.def.id;
-    this.input.placeholder = this.def.placeholder;
+    this.input.placeholder = this.def.placeholder || "";
 
     this.label = document.createElement("label");
     this.label.for = this.input.id;
@@ -722,7 +714,7 @@ class Select
       option.innerText = def_option.text;
       this.select.append(option);
     }
-    this.select.value = undefined;
+    this.select.value = null;
 
     this.label = document.createElement("label");
     this.label.for = this.select.id;
