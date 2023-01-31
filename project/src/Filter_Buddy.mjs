@@ -13,7 +13,11 @@ class Filter_Buddy extends HTMLElement
 
     this.attachShadow({mode: "open"});
     this.setAttribute("view", "min");
-    this.search_btn_html = "&telrec;";
+
+    this.search_btn_html = "<img src=\"/images/refresh.svg\">";
+    this.delete_btn_html = "&Cross;";
+    this.min_add_btn_html = "+ Add Filter";
+    this.mid_add_btn_html = "+ Add Filter";
 
     this.OnClick_Switch_View_Btn = this.OnClick_Switch_View_Btn.bind(this);
     this.OnClick_Set_View = this.OnClick_Set_View.bind(this);
@@ -78,7 +82,7 @@ class Filter_Buddy extends HTMLElement
     {
       res = "mid";
     }
-    else if (!this.max_view_div.hidden)
+    else if (this.max_view_div.open)
     {
       res = "max";
     }
@@ -324,8 +328,17 @@ class Filter_Buddy extends HTMLElement
     {
       this.min_view_div.hidden = true;
       this.mid_view_div.hidden = true;
-      this.max_view_div.hidden = true;
-      this[view_name + "_view_div"].hidden = false;
+      //this.max_view_div.hidden = true;
+      this.max_view_div.close();
+
+      if (view_name == "max")
+      {
+        this.max_view_div.showModal();
+      }
+      else
+      {
+        this[view_name + "_view_div"].hidden = false;
+      }
     }
     else
     {
@@ -392,7 +405,7 @@ class Filter_Buddy extends HTMLElement
       const delete_btn = document.createElement("button");
       delete_btn.addEventListener("click", () => this.OnClick_Del_Filter_Btn(def));
       delete_btn.classList.add("fb_del_btn");
-      delete_btn.innerHTML = "&Cross;";
+      delete_btn.innerHTML = this.delete_btn_html;
 
       span = document.createElement("span");
       if (def.text)
@@ -418,10 +431,13 @@ class Filter_Buddy extends HTMLElement
       for (const filter_def of filter_defs)
       {
         const filter = new filter_def.filter_class(filter_def, this);
-        const filter_elems = filter.Render();
-        elems.push(filter_elems);
-
         filter_def[view + "_filter"] = filter;
+
+        const filter_elem = document.createElement("li");
+        filter_elem.classList.add("filter_item");
+        filter_elem.append(...filter.Render());
+
+        elems.push(filter_elem);
       }
       
       const filters_div = this.Get_Elem_By_Id(filters_div_id);
@@ -538,7 +554,7 @@ class Filter_Buddy extends HTMLElement
       <span id="switch_view_list_placeholder"></span-->
 
       <span id="min_view_div">
-        <button id="min_add_filter_btn" class="fb_filter_btn">${filter_svg}</button>
+        <button id="min_add_filter_btn" class="fb_filter_btn">${this.min_add_btn_html}</button>
         <span id="min_summ_div"></span>
         <button id="min_search_btn">${this.search_btn_html}</button>
       </span>
@@ -546,22 +562,29 @@ class Filter_Buddy extends HTMLElement
       <span id="mid_view_div">
         <span id="mid_filters_div"></span>
         <span id="mid_btn_span">
-          <button id="mid_add_filter_btn" class="fb_filter_btn">${filter_svg}</button>
+          <button id="mid_add_filter_btn" class="fb_filter_btn">${this.mid_add_btn_html}</button>
           <button id="mid_search_btn">${this.search_btn_html}</button>
         </span>
         <div id="mid_summ_div"></div>
       </span>
 
-      <span id="max_view_div">
-        <span id="max_view_body">
-          <div id="max_filters_div"></div>
-          <div id="max_btn_div">
-            <button id="max_clear_btn">Clear</button>
-            <button id="max_search_btn">Search</button>
-            <button id="max_cancel_btn">Cancel</button>
-          </div>
-        </span>
-      </span>
+      <dialog id="max_view_div">
+        <div class="dialog_header">
+          Filters
+          <button id="max_cancel_btn" class="btn close_btn">
+            <img src="/images/close_menu_white.svg">
+          </button> 
+        </div>
+
+        <div id="max_view_body" class="dialog_body">
+          <ul id="max_filters_div" class="filter_list"></ul>
+        </div>
+
+        <div id="max_btn_div" class="dialog_footer">
+          <button id="max_clear_btn">Clear</button>
+          <button id="max_search_btn">Search</button>
+        </div>
+      </dialog>
     `;
     const doc = Utils.toDocument(html);
 
@@ -582,7 +605,7 @@ class Filter_Buddy extends HTMLElement
     this.max_view_div = doc.getElementById("max_view_div");
     this.min_view_div.hidden = true;
     this.mid_view_div.hidden = true;
-    this.max_view_div.hidden = true;
+    //this.max_view_div.hidden = true;
 
     //this.switch_view_btn = doc.getElementById("switch_view_btn");
     //this.switch_view_btn.addEventListener("click", this.OnClick_Switch_View_Btn);
@@ -640,15 +663,28 @@ class Text
     return res;
   }
 
+  Render_Input(def)
+  {
+    const input = document.createElement("input");
+    input.id = "ptFilter_" + def.id;
+    input.placeholder = def.placeholder || "";
+
+    return input;
+  }
+
+  Render_Label(def, input)
+  {
+    const label = document.createElement("label");
+    label.for = input.id;
+    label.innerText = def.label;
+
+    return label;
+  }
+
   Render()
   {
-    this.input = document.createElement("input");
-    this.input.id = "ptFilter_" + this.def.id;
-    this.input.placeholder = this.def.placeholder || "";
-
-    this.label = document.createElement("label");
-    this.label.for = this.input.id;
-    this.label.innerText = this.def.label;
+    this.input = this.Render_Input(this.def);
+    this.label = this.Render_Label(this.def, this.input);
 
     if (this.def.auto_search)
     {
@@ -703,22 +739,43 @@ class Select
     return res;
   }
 
-  Render()
+  Render_Select(def)
   {
-    this.select = document.createElement("select");
-    this.select.id = "ptFilter_" + this.def.id;
-    for (const def_option of this.def.options)
+    const select = document.createElement("select");
+    select.id = "ptFilter_" + def.id;
+
+    return select;
+  }
+
+  Render_Options(def, select)
+  {
+    if (def.options)
+  {
+      for (const def_option of def.options)
     {
       const option = document.createElement("option");
       option.value = def_option.value;
       option.innerText = def_option.text;
-      this.select.append(option);
+        select.append(option);
     }
-    this.select.value = null;
+    }
+  }
 
-    this.label = document.createElement("label");
-    this.label.for = this.select.id;
-    this.label.innerText = this.def.label;
+  Render_Label(def, select)
+  {
+    const label = document.createElement("label");
+    label.for = select.id;
+    label.innerText = def.label;
+
+    return label;
+  }
+
+  Render()
+  {
+    this.select = this.Render_Select(this.def);
+    this.Render_Options(this.def, this.select);
+    this.label = this.Render_Label(this.def, this.select);
+    this.select.value = null;
 
     if (this.def.auto_search)
     {
@@ -768,15 +825,28 @@ class Number
     return res;
   }
 
+  Render_Input(def)
+  {
+    const input = document.createElement("input");
+    input.id = "ptFilter_" + def.id;
+    input.type = "number";
+
+    return input;
+  }
+
+  Render_Label(def, input)
+  {
+    const label = document.createElement("label");
+    label.for = input.id;
+    label.innerText = def.label;
+
+    return label;
+  }
+
   Render()
   {
-    this.input = document.createElement("input");
-    this.input.id = "ptFilter_" + this.def.id;
-    this.input.type = "number";
-
-    this.label = document.createElement("label");
-    this.label.for = this.input.id;
-    this.label.innerText = this.def.label;
+    this.input = this.Render_Input(this.def);
+    this.label = this.Render_Label(this.def, this.input);
 
     return [this.label, this.input];
   }
@@ -834,5 +904,7 @@ class Date_Time
   }
 }
 Filter_Buddy.Date_Time = Date_Time;
+
+Utils.Register_Element(Filter_Buddy);
 
 export default Filter_Buddy;

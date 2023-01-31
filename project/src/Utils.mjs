@@ -22,6 +22,15 @@ class Utils
     return res;
   }
 
+  static Register_Element(elem_class)
+  {
+    const comp_class = customElements.get(elem_class.tname);
+    if (comp_class == undefined)
+    {
+      customElements.define(elem_class.tname, elem_class);
+    }
+  }
+
   static addDays(date, days)
   {
     const res = new Date(date);
