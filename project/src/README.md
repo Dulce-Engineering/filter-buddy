@@ -24,3 +24,12 @@ Filter Buddy currently supports the following filter types but custom filters ar
 - Select: A list of mutually-exclusive options
 - Number
 - Date & Time
+
+## Attributes
+- view
+
+## Properties
+- filters
+- view
+- mid_filter_defs
+- srch_btn_html

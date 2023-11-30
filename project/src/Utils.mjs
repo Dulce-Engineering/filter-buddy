@@ -141,6 +141,16 @@ class Utils
 
   // HTML =========================================================================================
 
+  static Set_Id_Shortcuts(src_elem, dest_elem, attr_name = "id")
+  {
+    const elems = src_elem.querySelectorAll("[" + attr_name + "]");
+    for (const elem of elems)
+    {
+      const id_value = elem.getAttribute(attr_name);
+      dest_elem[id_value] = elem;
+    }
+  }
+
   static Hide_Elem_If(root_elem, id, exp_fn)
   {
     const elem = root_elem.querySelector("#" + id);

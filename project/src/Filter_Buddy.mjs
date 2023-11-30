@@ -1,5 +1,4 @@
 import Utils from "./Utils.mjs";
-//import ptDropdown from "./DE_Dropdown.mjs"
 
 class Filter_Buddy extends HTMLElement 
 {
@@ -11,11 +10,32 @@ class Filter_Buddy extends HTMLElement
   {
     super();
 
-    this.attachShadow({mode: "open"});
     this.setAttribute("view", "min");
+    this.filter_svg = `
+      <svg 
+        class="fb_filter_img" 
+        aria-hidden="true" 
+        focusable="false" 
+        data-prefix="fas" 
+        data-icon="filter" 
+        class="svg-inline--fa fa-filter fa-w-16" 
+        role="img" 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 512 512">
+        <path 
+          fill="currentColor" 
+          d="M487.976 0H24.028C2.71 0-8.047 25.866 7.058 40.971L192 225.941V432c0 7.831 3.821 15.17 10.237 19.662l80 55.98C298.02 518.69 320 507.493 320 487.98V225.941l184.947-184.97C520.021 25.896 509.338 0 487.976 0z">
+        </path>
+      </svg>`;
+    this.refresh_svg = `
+      <svg width="23" height="23" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <circle style="fill:#A82FA1" cx="16" cy="16" r="14"/>
+        <path style="fill:#ffffff" d="m 16.0179,7.0002286 c 1.8938,0.004 3.8141,0.59437 5.3141,1.7626 1.0545,1.2148 -0.95476,2.5158004 -1.8597,1.3312004 -2.7242,-1.6483004 -6.5662,-1.0680004 -8.6158,1.3964 -1.0905,1.223 -1.7049,2.8549 -1.6977,4.4932 l 1.8003,0 c -0.96,1.440998 -1.9202,2.880998 -2.8803,4.320998 -0.9602,-1.44 -1.9203,-2.88 -2.8805,-4.319998 l 1.8003,0 c -0.0573,-3.912 2.756,-7.6331004 6.5325,-8.6462004 0.811,-0.2221 1.646,-0.3465 2.487,-0.3378 z m 7.9033,4.6808004 c 0.96016,1.4402 1.9203,2.8805 2.8805,4.320697 l -1.8003,0 c 0.051,3.958501 -2.8341,7.721301 -6.6772,8.681001 -2.5933,0.72418 -5.5256,0.19575 -7.657,-1.4611 -1.0874,-1.235 0.94976,-2.5235 1.8631,-1.3282 2.6394,1.6014 6.3356,1.0935 8.419,-1.1937 1.2066,-1.2432 1.901,-2.9653 1.8917,-4.698001 l -1.8003,0 c 0.96016,-1.440197 1.9203,-2.880497 2.8805,-4.320697 z"/>
+      </svg>
+    `;
 
-    this.search_btn_html = "<img src=\"/images/refresh.svg\">";
-    this.delete_btn_html = "&Cross;";
+    this.search_btn_html = this.refresh_svg;
+    this.delete_btn_html = "✕";
     this.min_add_btn_html = "+ Add Filter";
     this.mid_add_btn_html = "+ Add Filter";
 
@@ -33,21 +53,6 @@ class Filter_Buddy extends HTMLElement
   connectedCallback()
   {
     this.Render();
-  }
-
-  disconnectedCallback()
-  {
-
-  }
-
-  adoptedCallback()
-  {
-
-  }
-
-  //static observedAttributes = ["style-src"];
-  attributeChangedCallback(attrName, oldValue, newValue)
-  {
   }
 
   // fields =======================================================================================
@@ -102,11 +107,11 @@ class Filter_Buddy extends HTMLElement
     return res;
   }
 
-  set srch_btn_html(search_btn_html)
+  set srch_btn_html(html)
   {
-    this.search_btn_html = search_btn_html;
-    this.shadowRoot.getElementById("min_search_btn").innerHTML = this.search_btn_html;
-    this.shadowRoot.getElementById("mid_search_btn").innerHTML = this.search_btn_html;
+    this.search_btn_html = html;
+    this.min_search_btn.innerHTML = this.html;
+    this.mid_search_btn.innerHTML = this.html;
   }
 
   // events =======================================================================================
@@ -309,7 +314,7 @@ class Filter_Buddy extends HTMLElement
 
   Get_Elem_By_Id(id)
   {
-    return this.shadowRoot.getElementById(id);
+    return this.querySelector("[cid="+id+"]");
   }
 
   // rendering ====================================================================================
@@ -328,7 +333,6 @@ class Filter_Buddy extends HTMLElement
     {
       this.min_view_div.hidden = true;
       this.mid_view_div.hidden = true;
-      //this.max_view_div.hidden = true;
       this.max_view_div.close();
 
       if (view_name == "max")
@@ -407,7 +411,7 @@ class Filter_Buddy extends HTMLElement
       delete_btn.classList.add("fb_del_btn");
       delete_btn.innerHTML = this.delete_btn_html;
 
-      span = document.createElement("span");
+      span = document.createElement("li");
       if (def.text)
       {
         span.innerText = def.label + ": " + def.text;
@@ -452,183 +456,59 @@ class Filter_Buddy extends HTMLElement
 
   Render()
   {
-    const filter_svg = `
-      <svg 
-        class="fb_filter_img" 
-        aria-hidden="true" 
-        focusable="false" 
-        data-prefix="fas" 
-        data-icon="filter" 
-        class="svg-inline--fa fa-filter fa-w-16" 
-        role="img" 
-        xmlns="http://www.w3.org/2000/svg" 
-        viewBox="0 0 512 512">
-        <path 
-          fill="currentColor" 
-          d="M487.976 0H24.028C2.71 0-8.047 25.866 7.058 40.971L192 225.941V432c0 7.831 3.821 15.17 10.237 19.662l80 55.98C298.02 518.69 320 507.493 320 487.98V225.941l184.947-184.97C520.021 25.896 509.338 0 487.976 0z">
-        </path>
-      </svg>`;
-    let style = `
-      <style>
-        .fb_del_btn
-        {
-          border: none;
-          background: none;
-          padding: 0;
-          margin: 0px 0px 0px 4px;
-          cursor: pointer;
-          font-size: 14px;
-          color: #888;
-          font-weight: bold;
-        }
-        .fb_summ
-        {
-          background-color: #ddd;
-          border-radius: 100px;
-          font-family: sans-serif;
-          font-size: 10px;
-          padding: 4px 6px;
-          margin: 0px 2px;
-        }
-        .fb_filter_btn
-        {
-          height: 22px;
-        }
-        .fb_filter_img
-        {
-          height: 8px;
-        }
-        #mid_filters_div
-        {
-          display: inline-flex;
-          gap: 5px;
-          font-family: sans-serif;
-          font-size: 12px;
-          align-items: center;
-        }
-        #mid_filters_div label
-        {
-          margin-left: 10px;
-        }
-        #mid_btn_span
-        {
-          margin-left: 10px;
-        }
-        #max_view_body
-        {
-          font-family: sans-serif;
-          font-size: 12px;
-          display: inline-block;
-        }
-        #max_btn_div
-        {
-          justify-content: flex-end;
-          display: flex;
-          gap: 5px;
-          margin-top: 5px;
-        }
-        #max_filters_div
-        {
-          display: grid;
-          grid-template-columns: 1fr 2fr 1fr 2fr;
-          gap: 5px;
-        }
-        #max_filters_div label
-        {
-          justify-self: end;
-        }
-        #mid_summ_div
-        {
-          margin: 5px 0px 0px 10px;
-        }
-      </style>
-    `;
-    if (this.hasAttribute("style-src"))
-    {
-      style = "<link rel=\"stylesheet\" href=\"" + this.getAttribute("style-src") + "\"></link>";
-    }
     const html = `
-      ${style}
+      <!--button cid="switch_view_btn">view</button>
+      <span cid="switch_view_list_placeholder"></span-->
 
-      <!--button id="switch_view_btn">view</button>
-      <span id="switch_view_list_placeholder"></span-->
-
-      <span id="min_view_div">
-        <button id="min_add_filter_btn" class="fb_filter_btn">${this.min_add_btn_html}</button>
-        <span id="min_summ_div"></span>
-        <button id="min_search_btn">${this.search_btn_html}</button>
+      <span cid="min_view_div" hidden>
+        <button cid="min_add_filter_btn" class="fb_filter_btn">
+          <span class="fb_filter_btn_label">${this.min_add_btn_html}</span>
+          </button>
+        <ul cid="min_summ_div"></ul><button cid="min_search_btn">
+          <span class="search_btn_label">${this.search_btn_html}</span>
+        </button>
       </span>
 
-      <span id="mid_view_div">
-        <span id="mid_filters_div"></span>
-        <span id="mid_btn_span">
-          <button id="mid_add_filter_btn" class="fb_filter_btn">${this.mid_add_btn_html}</button>
-          <button id="mid_search_btn">${this.search_btn_html}</button>
+      <span cid="mid_view_div" hidden>
+        <span cid="mid_filters_div"></span>
+        <span cid="mid_btn_span">
+          <button cid="mid_add_filter_btn" class="fb_filter_btn">${this.mid_add_btn_html}</button>
+          <button cid="mid_search_btn">${this.search_btn_html}</button>
         </span>
-        <div id="mid_summ_div"></div>
+        <div cid="mid_summ_div"></div>
       </span>
 
-      <dialog id="max_view_div">
+      <dialog cid="max_view_div">
         <div class="dialog_header">
-          Filters
-          <button id="max_cancel_btn" class="btn close_btn">
-            <img src="/images/close_menu_white.svg">
+          <button cid="max_cancel_btn" class="btn close_btn">
+            <span class="cancel_btn_label">✕</span>
           </button> 
+          Filters
         </div>
 
-        <div id="max_view_body" class="dialog_body">
-          <ul id="max_filters_div" class="filter_list"></ul>
+        <div cid="max_view_body" class="dialog_body">
+          <ul cid="max_filters_div" class="filter_list"></ul>
         </div>
 
-        <div id="max_btn_div" class="dialog_footer">
-          <button id="max_clear_btn">Clear</button>
-          <button id="max_search_btn">Search</button>
+        <div cid="max_btn_div" class="dialog_footer">
+          <button cid="max_clear_btn">Clear</button>
+          <button cid="max_search_btn">Search</button>
         </div>
       </dialog>
     `;
-    const doc = Utils.toDocument(html);
+    this.innerHTML = html;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
 
-    let search_btn = doc.getElementById("min_search_btn");
-    search_btn.addEventListener("click", this.OnClick_Search_Btn);
-    search_btn = doc.getElementById("mid_search_btn");
-    search_btn.addEventListener("click", this.OnClick_Search_Btn);
-    search_btn = doc.getElementById("max_search_btn");
-    search_btn.addEventListener("click", this.OnClick_Search_Btn);
+    this.min_search_btn.addEventListener("click", this.OnClick_Search_Btn);
+    this.mid_search_btn.addEventListener("click", this.OnClick_Search_Btn);
+    this.max_search_btn.addEventListener("click", this.OnClick_Search_Btn);
 
-    const min_add_filter_btn = doc.getElementById("min_add_filter_btn");
-    min_add_filter_btn.addEventListener("click", this.OnClick_Min_Add_Filter_Btn);
-    const mid_add_filter_btn = doc.getElementById("mid_add_filter_btn");
-    mid_add_filter_btn.addEventListener("click", this.OnClick_Mid_Add_Filter_Btn);
+    this.min_add_filter_btn.addEventListener("click", this.OnClick_Min_Add_Filter_Btn);
+    this.mid_add_filter_btn.addEventListener("click", this.OnClick_Mid_Add_Filter_Btn);
 
-    this.min_view_div = doc.getElementById("min_view_div");
-    this.mid_view_div = doc.getElementById("mid_view_div");
-    this.max_view_div = doc.getElementById("max_view_div");
-    this.min_view_div.hidden = true;
-    this.mid_view_div.hidden = true;
-    //this.max_view_div.hidden = true;
-
-    //this.switch_view_btn = doc.getElementById("switch_view_btn");
-    //this.switch_view_btn.addEventListener("click", this.OnClick_Switch_View_Btn);
-
-    let btn = doc.getElementById("max_clear_btn");
-    btn.addEventListener("click", this.OnClick_Max_Clear_Btn);
-    btn = doc.getElementById("max_cancel_btn");
-    btn.addEventListener("click", this.OnClick_Max_Cancel_Btn);
-
-    //await window.customElements.whenDefined('pt-dropdown');
-    /*const items = 
-    [
-      {label: 'Close', action: this.OnClick_Set_View, data: "min"},
-      {label: 'Minimal', action: this.OnClick_Set_View, data: "mid"},
-      {label: 'Open', action: this.OnClick_Set_View, data: "max"},
-    ];
-    const switch_view_list = new ptDropdown();
-    switch_view_list.items = items;
-    switch_view_list.srcElem = this.switch_view_btn;
-    switch_view_list.style.width = "100px";
-    doc.getElementById("switch_view_list_placeholder").append(switch_view_list);*/
+    this.max_clear_btn.addEventListener("click", this.OnClick_Max_Clear_Btn);
+    this.max_cancel_btn.addEventListener("click", this.OnClick_Max_Cancel_Btn);
     
-    this.shadowRoot.append(doc);
     this.view = this.getAttribute("view");
   }
 }
